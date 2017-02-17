@@ -9,8 +9,85 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activity.MainActivity">
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Thread"
+        android:id="@+id/thread_button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <com.example.shinoharanaoki.chordy_proto.view.KeyboardView
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:id="@+id/keyboard_view"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/thread_button"
+        android:layout_toEndOf="@+id/thread_button"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_alignBottom="@+id/thread_button"
+        android:id="@+id/linearLayout">
+
+        <Spinner
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            android:spinnerMode="dropdown"
+            android:dropDownWidth="80dp" />
+
+        <Spinner
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner2"
+            android:spinnerMode="dropdown" />
+
+        <Spinner
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner3"
+            android:layout_weight="0.36"
+            android:spinnerMode="dropdown" />
+
+        <EditText
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/term_length_imput"
+            android:layout_weight="0.02" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="ms"
+            android:id="@+id/textView2" />
+
+        <Button
+            android:layout_width="15dp"
+            android:layout_height="wrap_content"
+            android:text="OK"
+            android:id="@+id/ok_button"
+            android:layout_weight="1"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <com.example.shinoharanaoki.chordy_proto.view.ChordView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:id="@+id/chord_view"
+        android:layout_above="@+id/keyboard_view"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

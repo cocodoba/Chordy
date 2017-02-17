@@ -10,8 +10,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.example.shinoharanaoki.chordy_proto.Chord;
+import com.example.shinoharanaoki.chordy_proto.data.Chord;
 import com.example.shinoharanaoki.chordy_proto.R;
+import com.example.shinoharanaoki.chordy_proto.enums.Note;
+import com.example.shinoharanaoki.chordy_proto.enums.ScaleType;
+import com.example.shinoharanaoki.chordy_proto.factory.ScaleFactory;
+import com.example.shinoharanaoki.chordy_proto.view.ChordView;
+import com.example.shinoharanaoki.chordy_proto.view.KeyboardView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,11 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private Spinner chord_structure_select_spinner;
     private EditText length_imput;
 
-    private KeyBoardView keyboard_view;
-    private ChordTermEditView chord_edit_view;
-    private boolean isThreadRunning = false;
+    private KeyboardView keyboardView;
+    private ChordView chordView;
+    //private boolean isThreadRunning = false;
 
-    public ArrayList<ChordTerm> chordTerms_arraylist; //スレッド再生用
+    //public ArrayList<ChordTerm> chordTerms_arraylist; //スレッド再生用
     private int key_tonic;     //キーボードのキー表示変更用
     public String key_string;  //key選択スピナーで取得したキー名を保持
     public String root_absolute_string; //キーを指定していない場合のルート音
@@ -38,32 +43,65 @@ public class MainActivity extends AppCompatActivity {
     private Thread thread;
     boolean isThreadRunning = false;
 
+    private ScaleFactory scaleFactory;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chord_board);
+        setContentView(R.layout.activity_main);
 
-        keyboard_view = (KeyBoardView) findViewById(R.id.keyboard_view);
-        chord_edit_view = (ChordTermEditView)findViewById(R.id.chordterm_edit_view);
+        //各Viewを取り込む
+        keyboardView = (KeyboardView) findViewById(R.id.keyboard_view);
+        chordView = (ChordView)findViewById(R.id.chord_view);
 
-        chordTerms_arraylist = new ArrayList<>();
-        chord_edit_view.setChordTermsList(chordTerms_arraylist);
+        //スレッドに必要なコードのシーケンス
+        //chordTerms_arraylist = new ArrayList<>();
+        //chord_edit_view.setChordTermsList(chordTerms_arraylist);
+
+        scaleFactory = new ScaleFactory();
+        keyboardView.resetFullKeyboardState(scaleFactory.getScale(Note.C, ScaleType.MAJOR));
 
         // Spinnerの設定
-        /* 1. キーを選択するスピナー*/
+        //setupSpinners();
+        // ボタンの設定
+        //setupButtons();
+
+    }
+
+    /*
+    public void startThread(ChordTerm[] chordterms){
+        if (!isThreadRunning) {
+            chord_sequence = chordterms;
+            thread = new Thread(this);
+            isThreadRunning = true;
+            thread.start();
+            Log.d(TAG, "startThread: ");
+        }
+    }
+
+    public void endThread(){
+        if (isThreadRunning) {
+            isThreadRunning = false;
+            Log.d(TAG, "endThread: ");
+        }
+    }*/
+
+    /*private void setupSpinners(){
+            *//* 1. キーを選択するスピナー*//*
         final ArrayAdapter<CharSequence> key_adapter =
                 ArrayAdapter.createFromResource(this, R.array.key_array,
                         android.R.layout.simple_spinner_item);
 
-        /**
+        *//**
          * ルートを指定するスピナーに設定するアダプタを２通り用意
-         * */
-        /*C,D,E,,,で表示するアダプタ*/
+         * *//*
+        *//*C,D,E,,,で表示するアダプタ*//*
         final ArrayAdapter<CharSequence> root_absolute_adapter =
                 ArrayAdapter.createFromResource(this, R.array.root_absolute_array,
                         android.R.layout.simple_spinner_item);
         root_absolute_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        /*I,II,III,,,で表示するアダプタ*/
+        *//*I,II,III,,,で表示するアダプタ*//*
         final ArrayAdapter<CharSequence> root_relative_adapter =
                 ArrayAdapter.createFromResource(this, R.array.root_relative_array,
                         android.R.layout.simple_spinner_item);
@@ -78,14 +116,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Spinner spinner = (Spinner) parent;
-                /**
+                *//**
                  * キーを選択するスピナーで、キーを指定無しにした場合のみ、隣のルートを選択するスピナーにおいて、root=C,D,E,,,のように絶対音で
                  * 選択するように表示を切り替える。
-                 */
+                 *//*
                 if(spinner.getSelectedItemPosition()==0){
-                    /**(キー指定なし)*/
+                    *//**(キー指定なし)*//*
                     is_key_selected = false;
-                    /*2(A). ルートをC,D,E,,,で選択するスピナー*/
+                    *//*2(A). ルートをC,D,E,,,で選択するスピナー*//*
                     root_select_spinner.setAdapter(root_absolute_adapter);
                     root_select_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
@@ -100,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }else{
-                    /**(キー選択)*/
+                    *//**(キー選択)*//*
                     is_key_selected = true;
                     key_string = spinner.getSelectedItem().toString();//FIXME
                     keyboard_view.nowKeyString = key_string;
@@ -108,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     keyboard_view.nowKey = key_tonic;
                     keyboard_view.setupKeyBoardScaleOfNowKey();
 
-                     /*2(B). ルートをI,II,III,,,で選択するスピナー*/
+                     *//*2(B). ルートをI,II,III,,,で選択するスピナー*//*
                     root_select_spinner.setAdapter(root_relative_adapter);
                     root_select_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
@@ -127,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                /**(キー指定なし)*/
-                /*2(A). ルートをC,D,E,,,で選択するスピナー*/
+                *//**(キー指定なし)*//*
+                *//*2(A). ルートをC,D,E,,,で選択するスピナー*//*
                 is_key_selected = false;
                 root_absolute_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 root_select_spinner.setAdapter(root_absolute_adapter);
@@ -147,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* 3. コードシンボル(構成)を選択するスピナー*/
+        *//* 3. コードシンボル(構成)を選択するスピナー*//*
         ArrayAdapter<CharSequence> chord_structure_adapter =
                 ArrayAdapter.createFromResource(this, R.array.chord_structure_array,
                         android.R.layout.simple_spinner_item);
@@ -169,7 +207,11 @@ public class MainActivity extends AppCompatActivity {
 
         length_imput = (EditText)findViewById(R.id.term_length_imput);
 
-        // ボタンの設定
+    }
+
+
+    private void setupButtons(){
+
         Button okButton;
         okButton = (Button)findViewById(R.id.ok_button);
         okButton.setOnClickListener(new Button.OnClickListener() {
@@ -215,22 +257,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    public void startThread(ChordTerm[] chordterms){
-        if (!isThreadRunning) {
-            chord_sequence = chordterms;
-            thread = new Thread(this);
-            isThreadRunning = true;
-            thread.start();
-            Log.d(TAG, "startThread: ");
-        }
-    }
-
-    public void endThread(){
-        if (isThreadRunning) {
-            isThreadRunning = false;
-            Log.d(TAG, "endThread: ");
-        }
-    }
-
+*/
 }
